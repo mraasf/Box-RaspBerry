@@ -1,0 +1,100 @@
+<GPIO_TK>:
+    
+# Gambiarrista :  Andriely Franca (mraasf)
+#desde 1990 fazendo gambiarras
+
+
+
+    BoxLayout:
+        orientation:"vertical"
+        
+        Label:
+            id:Lbl_Identificacao 
+            text:"Identificacao"
+        TextInput:
+            text:" "
+            id:TI_Identificacao    
+        Label:
+            id:Lbl_AlavancaAtiva 
+            text:"Alavanca Ativa"    
+        TextInput:
+            text:" "
+            id:TI_AlavancaAtiva
+        Label:
+            id:Lbl_TempoLimite 
+            text:"Tempo Limite (em minutos)"
+        TextInput:
+            text:" "
+            id:TI_TempoLimite    
+        Button:
+            id:button1
+            text:"Teste Padrao"
+            on_press:root.GPIO_activate()
+        #status
+        Label:
+            text:" Tempo Restante"
+            id:Lbl_Status
+        
+            
+    #tela de saida        
+    BoxLayout:
+        orientation:"vertical"
+        #identificacao
+        Label:
+            text:"Identificacao do animal"
+            id:TLbl_Identificacao_saida0
+        Label:
+            id:Lbl_Identificacao_saida 
+            text:" "
+        #toques na direita
+        Label:
+            text:"Toques na direita"
+            id:Lbl_Toques_direita0
+        Label:
+            id:Lbl_Toques_direita
+            text:" "
+        #toques na esquerda
+        Label:
+            text:"Toques na esquerda"
+            id:Lbl_Toques_esquerda0
+        Label:
+            id:Lbl_Toques_esquerda
+            text:""
+        #data e hora iniciais
+        Label:
+            text:"Data e hora Iniciais"
+            id:Lbl_Data_Hora_Inicio0
+        Label:
+            id:Lbl_Data_Hora_Inicio
+            text:" "
+        #data e hora finais
+        Label:
+            text:"Data e hora Finais "
+            id:Lbl_Data_Hora_termino0
+        Label:
+            id:Lbl_Data_Hora_termino
+            text:" "
+        # alavanca ativa
+        Label:
+            text:" Alavanca Ativa"
+            id:Lbl_Alav_Ativ0
+        Label:
+            id:Lbl_Alav_Ativa
+            text:" "
+        #acertos
+        Label:
+            text:" Acertos "
+            id:Lbl_Acertos0
+        Label:
+            id:Lbl_Acertos0
+            text:" "
+        #Erros
+        Label:
+            text:"Erros "
+            id:Lbl_Erros0
+        Label:
+            id:Lbl_Erros
+            text:" "
+            
+        
+            
