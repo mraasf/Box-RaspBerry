@@ -74,6 +74,7 @@ class GPIO_TK(App,BoxLayout):
     Direita_press = 0
     Esquerda_press = 0
     tempo = 2
+    alavanca_ativa = "padrao"
     def Direita(self):
             alavanca_ativa="Direita"
     def Esquerda(self):
@@ -83,13 +84,13 @@ class GPIO_TK(App,BoxLayout):
         #pega os text inputs
         identificacao_soinho = self.ids.TI_Identificacao.text
         tempo_limite=int(self.ids.TI_TempoLimite.text)
+        alavanca_ativa = self.ids.TI_AlavancaAtiva.text
                   
         #pega as horas inicial e final
         data_hora_inicial = time.asctime(time.localtime(time.time()))
              
         
         for tempo in range(tempo_limite*TAM):
-            self.ids.Lbl_Status.text=str(tempo)
             GPIO.output(Alav_Direita,GPIO.HIGH)
             GPIO.output(Alav_Esquerda,GPIO.HIGH)
             tempo +=1
@@ -113,11 +114,10 @@ class GPIO_TK(App,BoxLayout):
                 
             
         
-        #self.ids.Lbl_TempoLimite.text=tempo_limite
         
-        #self.ids.Lbl_Identificacao.text=identificacao_soinho
       
     def build(self):
+        self.title="Soinhos Box - Version 0.0.2"
         return GPIO_TK()
  
 if __name__ == '__main__':
