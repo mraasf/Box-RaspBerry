@@ -10,13 +10,13 @@
         
         Label:
             id:Lbl_Identificacao 
-            text:"Identificacao"
+            text:"Identificacao :"
         TextInput:
             text:" "
             id:TI_Identificacao    
         Label:
             id:Lbl_AlavancaAtiva 
-            text:"Alavanca Ativa"    
+            text:"Alavanca Ativa :"    
         TextInput:
             text:" "
             id:TI_AlavancaAtiva
@@ -30,7 +30,7 @@
         #    on_press:root.Esquerda()    
         Label:
             id:Lbl_TempoLimite 
-            text:"Tempo Limite (em minutos)"
+            text:"Tempo Limite (em minutos):"
         TextInput:
             text:" "
             id:TI_TempoLimite    
@@ -38,9 +38,17 @@
             id:button1
             text:"Teste Padrao"
             on_press:root.GPIO_activate()
+        Button:
+            id:button2
+            text:"Omission"
+            on_press:root.GPIO_Omission()
+        Button:
+            id:button3
+            text:"Yoked"
+            on_press:root.GPIO_Yoked()
         #status
         Label:
-            text:" Tempo Restante"
+            text:"  "
             id:Lbl_Status
         
             
@@ -49,60 +57,83 @@
         orientation:"vertical"
         #identificacao
         Label:
-            text:"Identificacao do animal"
+            text:"Animal :"
             id:TLbl_Identificacao_saida0
+        
+        Label:
+            text:"Alavanca Ativa :"
+            id:Lbl_Alav_Ativ0    
+        #toques na direita
+        Label:
+            text:"Toques na direita :"
+            id:Lbl_Toques_direita0
+        #toques na esquerda
+        Label:
+            text:"Toques na esquerda :"
+            id:Lbl_Toques_esquerda0
+        
+        Label:
+            text:"Acertos :"
+            id:Lbl_Acertos0
+        
+        Label:
+            text:"Erros :"
+            id:Lbl_Erros0    
+        #data e hora iniciais
+            
+        Label:
+            text:"Data e hora Iniciais :"
+            id:Lbl_Data_Hora_Inicio0
+        Label:
+            text:"Data e hora Finais :"
+            id:Lbl_Data_Hora_termino0
+        Label:
+            id:Lbl_Alimentos
+            text:" Alimentos Liberados: "    
+        Button:
+            id:button4
+            text:"Carregar script"
+                
+    BoxLayout:
+        orientation:"vertical"
+        #data e hora finais
+            
         Label:
             id:Lbl_Identificacao_saida 
             text:" "
-        #toques na direita
-        Label:
-            text:"Toques na direita"
-            id:Lbl_Toques_direita0
-        Label:
-            id:Lbl_Toques_direita
-            text:" "
-        #toques na esquerda
-        Label:
-            text:"Toques na esquerda"
-            id:Lbl_Toques_esquerda0
-        Label:
-            id:Lbl_Toques_esquerda
-            text:""
-        #data e hora iniciais
-        Label:
-            text:"Data e hora Iniciais"
-            id:Lbl_Data_Hora_Inicio0
-        Label:
-            id:Lbl_Data_Hora_Inicio
-            text:" "
-        #data e hora finais
-        Label:
-            text:"Data e hora Finais "
-            id:Lbl_Data_Hora_termino0
-        Label:
-            id:Lbl_Data_Hora_termino
-            text:" "
+        
         # alavanca ativa
-        Label:
-            text:" Alavanca Ativa"
-            id:Lbl_Alav_Ativ0
         Label:
             id:Lbl_Alav_Ativa
             text:" "
+        
+        Label:
+            id:Lbl_Toques_direita
+            text:" "
+            
+        Label:
+            id:Lbl_Toques_esquerda
+            text:""    
         #acertos
         Label:
-            text:" Acertos "
-            id:Lbl_Acertos0
-        Label:
-            id:Lbl_Acertos0
+            id:Lbl_Acertos
             text:" "
         #Erros
         Label:
-            text:"Erros "
-            id:Lbl_Erros0
-        Label:
             id:Lbl_Erros
             text:" "
+        Label:
+            id:Lbl_Data_Hora_Inicio
+            text:" "
+        Label:
+            id:Lbl_Data_Hora_termino
+            text:" "
+        Label:
+            id:Lbl_Alimntos_liberados
+            text:" "    
+        TextInput:
+            text:"/home/pi/scripts/New_Script.txt"
+            id:TI_Scripts     
             
         
             
