@@ -17,7 +17,7 @@ import csv
 from kivy.properties import ObjectProperty
 
 TAM = 60
-
+# atribui variaveis as saidas
 Alimento = 40
 Alav_Esquerda = 38
 Alav_Direita = 36
@@ -144,7 +144,7 @@ class GPIO_TK(App,BoxLayout):
                 # arquivo csv
                 with open("exit.csv", "a") as csvfile:
                     ExitFile = csv.writer(csvfile)
-                    ExitFile.writerow([identificacao_soinho,data_hora_inicial,Direita_press,alavanca_ativa,Acertos,Esquerda_press,data_hora_final,Erros,"Test"]) # escreve as strings de saida no csv
+                    ExitFile.writerow([identificacao_soinho,data_hora_inicial,Direita_press,alavanca_ativa,Acertos,Esquerda_press,data_hora_final,Erros,Alimento_lib,"Test"]) # escreve as strings de saida no csv
                     break
             
                 
@@ -233,7 +233,7 @@ class GPIO_TK(App,BoxLayout):
                 # arquivo csv
                 with open("exit.csv", "a") as csvfile:
                     ExitFile = csv.writer(csvfile)
-                    ExitFile.writerow([identificacao_soinho,data_hora_inicial,Direita_press,alavanca_ativa,Acertos,Esquerda_press,data_hora_final,Erros,"Omission"]) # escreve as strings de saida no csv
+                    ExitFile.writerow([identificacao_soinho,data_hora_inicial,Direita_press,alavanca_ativa,Acertos,Esquerda_press,data_hora_final,Erros,Alimento_lib,"Omission"]) # escreve as strings de saida no csv
                     break
             
     def GPIO_Yoked(self):
@@ -322,7 +322,7 @@ class GPIO_TK(App,BoxLayout):
                 # arquivo csv
                 with open("exit.csv", "a") as csvfile:
                     ExitFile = csv.writer(csvfile)
-                    ExitFile.writerow([identificacao_soinho,data_hora_inicial,Direita_press,alavanca_ativa,Acertos,Esquerda_press,data_hora_final,Erros,"Yoked"]) # escreve as strings de saida no csv
+                    ExitFile.writerow([identificacao_soinho,data_hora_inicial,Direita_press,alavanca_ativa,Acertos,Esquerda_press,data_hora_final,Erros,Alimento_lib,"Yoked"]) # escreve as strings de saida no csv
                     break
             
            
