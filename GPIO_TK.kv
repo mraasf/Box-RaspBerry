@@ -4,10 +4,26 @@
 #desde 1990 fazendo gambiarras
 
 
+    canvas:
+        Color:
+            rgb: .2,.2,.2
+        Rectangle:
+            pos : self.pos
+            size : self.size
 
+
+    
     BoxLayout:
         orientation:"vertical"
         
+        
+        Label:
+            id:Lbl_Pesquisador 
+            text:"Pesquisador :"
+        TextInput:
+            text:" "
+            id:TI_Pesquisador
+            
         Label:
             id:Lbl_Identificacao 
             text:"Identificacao :"
@@ -16,42 +32,71 @@
             id:TI_Identificacao    
         Label:
             id:Lbl_AlavancaAtiva 
-            text:"Alavanca Ativa :"    
-        TextInput:
-            text:" "
-            id:TI_AlavancaAtiva
-        #Button:
-        #    id:btn_direita
-        #    text:"Direita"
-        #    on_press:root.Direita()
-        #Button:
-        #    id:btn_esquerda
-        #    text:"Esquerda "
-        #    on_press:root.Esquerda()    
+            text:"Alavanca Ativa :"
+        BoxLayout:
+            orientation:"horizontal"        
+            Label:
+                id:Lbl_AlavancaDireita 
+                text:"Direita :"
+            CheckBox:
+                group: 'check'
+                id:Ck_Direita
+            Label:
+                id:Lbl_AlavancaEsquerda
+                text:"Esquerda :"
+            CheckBox:
+                group: 'check'
+                id:Ck_Esquerda
+                
         Label:
             id:Lbl_TempoLimite 
             text:"Tempo Limite (em minutos):"
         TextInput:
             text:" "
-            id:TI_TempoLimite    
-        Button:
-            id:button1
-            text:"Teste Padrao"
-            on_press:root.GPIO_activate()
-        Button:
-            id:button2
-            text:"Omission"
-            on_press:root.GPIO_Omission()
-        Button:
-            id:button3
-            text:"Yoked"
-            on_press:root.GPIO_Yoked()
-        #status
+            id:TI_TempoLimite
+            
+        Label:
+            id:Lbl_TipoTeste 
+            text:"Tipo de teste :"
+        BoxLayout:
+            orientation:"horizontal"        
+            Label:
+                id:LblCK_test 
+                text:"Test "
+            CheckBox:
+                group: 'check_test'
+                id:Ck_Test
+            Label:
+                id:LblCK_Omission 
+                text:"Omission "
+            CheckBox:
+                group: 'check_test'
+                id:Ck_Omission
+        BoxLayout:
+            orientation:"horizontal"        
+            Label:
+                id:LblCK_Yoked 
+                text:"Yoked "
+            CheckBox:
+                group: 'check_test'
+                id:Ck_Yoked
+            Label:
+                id:LblCK_Script 
+                text:"Script "
+            CheckBox:
+                group: 'check_test'
+                id:Ck_Script        
         Label:
             text:"  "
             id:Lbl_Status
+        TextInput:
+            text:"/home/pi/scripts/New_Script.txt"
+            id:TI_Scripts
+     
+        #status
         
             
+                
     #tela de saida        
     BoxLayout:
         orientation:"vertical"
@@ -131,9 +176,10 @@
         Label:
             id:Lbl_Alimntos_liberados
             text:" "    
-        TextInput:
-            text:"/home/pi/scripts/New_Script.txt"
-            id:TI_Scripts     
+        Button:
+            id:button1
+            text:"Inciar teste"
+            on_press:root.GPIO_activate()     
             
         
             
