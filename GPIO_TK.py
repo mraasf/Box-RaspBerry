@@ -17,7 +17,7 @@ import time
 import csv
 from kivy.properties import StringProperty
 
-TAM = 60
+TAM = 12
 # atribui variaveis as saidas
 Alimento = 40
 Alav_Esquerda = 38
@@ -55,6 +55,7 @@ tempo = 0
 tempo2 = 0
 tempo3 = 0
 Alimento_lib = 0
+tempo_limite = 10
 alavanca_ativa =StringProperty("padrao")
 
 
@@ -71,7 +72,8 @@ class GPIO_TK(App,BoxLayout):
         global Esquerda_press
         global Acertos
         global Erros
-        global alavanca_ativa 
+        global alavanca_ativa
+        global tempo_limite
         #inicializacao das variaveis
         Direita_press = 0
         Esquerda_press = 0
@@ -88,15 +90,45 @@ class GPIO_TK(App,BoxLayout):
             alavanca_ativa = "Direita"
         if self.ids.Ck_Esquerda.active:
             alavanca_ativa = "Esquerda"    
-   
+   #altera o tempo limite e a libera;'ao da recompensa de acoprdo com o texto
+        #Pre treino
+        if self.ids.Ck_Pre_Treino.active:
+            #TipoTest = "Pre treino"
+               #define o tempo limite em 15 minutos
+            tempo_limite = int(TAM/4)
+               
+            #Treinamento
+        if self.ids.Ck_Treinamento.active or self.ids.Ck_Omission.active or self.ids.Ck_Test.active:
+               #define o tempo limite em  30 minutos
+            tempo_limite = TAM/2
+               #time.sleep(0.2)
+            
+            #Reativacao
+        if self.ids.Ck_Reativacao.active:
+            #TipoTest = "Reativacao"
+            #define o tempo limite em  20 minutos
+            tempo_limite = TAM/3
+               #time.sleep(0.2)
+            #test
+        
+            #omission
+        #if :    
+         #   TipoTest = "Omission"
+                 #define o tempo limite em  30 minutos
+          #  tempo_limite = TAM/2
+                #if tempo2 == 60:
+                #    GPIO.output(House_Light,GPIO.HIGH)
+                #    Alimento_lib +=1
+                #    tempo2 = 0
+                #    time.sleep(0.2)
+            
         
          
         #pega os text inputs
         identificacao_soinho = self.ids.TI_Identificacao.text
-        tempo_limite=int(self.ids.TI_TempoLimite.text)
         Pesquisador = self.ids.TI_Pesquisador.text
-        #alavanca_ativa = str(alavanca_ativa)
-                          
+        #seta o tempo limite na tela e exibe a mensagem do tipo de teste inicializado
+        #self.ids.Lbl_Status.text=TipoTest+" Iniciado "
         
         #ativa as alavancas e a luz geral
         GPIO.output(Alav_Direita,GPIO.HIGH)
@@ -106,7 +138,7 @@ class GPIO_TK(App,BoxLayout):
         #pega a hora inicial
         data_hora_inicial = time.asctime(time.localtime(time.time()))
         
-        for tempo in range(tempo_limite*TAM*2):
+        for tempo in range(int(tempo_limite*TAM*2)):
             #pega as entradas e incrementa os toques na Direita
             if GPIO.input(Direita) == 1:
                 #nao acontece nada pois a saida trabalha ativada
@@ -131,35 +163,29 @@ class GPIO_TK(App,BoxLayout):
                     Erros += 1
             #continua contadndo o tempo
             tempo +=1
+            
  #verifica o tipo de teste e e executa de acordo com as condicoes
+            #pre treino
+            if self.ids.Ck_Pre_Treino.active:
+               TipoTest = "Pre treino"
+               #libera um alimeto a cada minuto
+               if ((tempo_limite*TAM*2) % 60 )== 0 :
+                   GPIO.output(Alimento,GPIO.HIGH)
+                   Alimento_lib +=1
+            #treinamento
+            if self.ids.Ck_Treinamento.active:
+               TipoTest = "Treinamento"
+            #reativacao
+            if self.ids.Ck_Reativacao.active:
+               TipoTest = "Reativacao"
             #test
             if self.ids.Ck_Test.active:
-                TipoTest = "Test "
-            
+               TipoTest = "Test"
             #omission
-            if self.ids.Ck_Omission.active:    
-                #libera o alimento a cada 30 segundos e deliga a saida logo apos
-                TipoTest = "Omission"
-                if tempo2 == 60:
-                    GPIO.output(House_Light,GPIO.HIGH)
-                    Alimento_lib +=1
-                    tempo2 = 0
-                    time.sleep(0.2)
-            #yoked        
-            if self.ids.Ck_Yoked.active:
-                TipoTest = "yoked"
-                if 30 > tempo3 < 90   :
-                    GPIO.output(House_Light,GPIO.HIGH)
-                    Alimento_lib +=1
-                    tempo3 = 0
-            time.sleep(0.2)
-            #script
-            if self.ids.Ck_Script.active:
-               #implementar o script
-               TipoTest = "Script" 
-
+            if self.ids.Ck_Omission.active:
+               TipoTest = "Omission"   
+            #pausa o processo por meio segundo garantindo o lag da leitura   
             time.sleep(0.5)
-            
             # verifica se o tempo limite foi alcancado
             if tempo == tempo_limite*TAM*2:
                 #quando otempo limite for alcancado desliga as saidas exibe as saidas na tela e gera o relatorio em csv
@@ -177,6 +203,7 @@ class GPIO_TK(App,BoxLayout):
                 data_hora_final = time.asctime(time.localtime(time.time()))
                 self.ids.Lbl_Data_Hora_termino.text=str(data_hora_final)
                 self.ids.Lbl_Alimntos_liberados.text=str(Alimento_lib)
+                self.ids.Lbl_TempoLimite2.text=str(tempo_limite)
                 self.ids.Lbl_Status.text=TipoTest+" Finalizado "
                 
                 

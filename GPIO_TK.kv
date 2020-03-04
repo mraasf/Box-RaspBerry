@@ -26,7 +26,7 @@
             
         Label:
             id:Lbl_Identificacao 
-            text:"Identificacao :"
+            text:"Identificacao do animal:"
         TextInput:
             text:" "
             id:TI_Identificacao    
@@ -51,9 +51,9 @@
         Label:
             id:Lbl_TempoLimite 
             text:"Tempo Limite (em minutos):"
-        TextInput:
+        Label:
+            id:Lbl_TempoLimite2 
             text:" "
-            id:TI_TempoLimite
             
         Label:
             id:Lbl_TipoTeste 
@@ -61,31 +61,39 @@
         BoxLayout:
             orientation:"horizontal"        
             Label:
+                id:LblCK_Pre_Treino 
+                text:"Pre Treino "
+            CheckBox:
+                group: 'check_test'
+                id:Ck_Pre_Treino
+            Label:
+                id:LblCK_treinamento 
+                text:"Treinamento"
+            CheckBox:
+                group: 'check_test'
+                id:Ck_Treinamento
+            
+        BoxLayout:
+            orientation:"horizontal"        
+            Label:
+                id:LblCK_Reativacao 
+                text:"Reativacao "
+            CheckBox:
+                group: 'check_test'
+                id:Ck_Reativacao
+            Label:
                 id:LblCK_test 
                 text:"Test "
             CheckBox:
                 group: 'check_test'
                 id:Ck_Test
+        BoxLayout:
             Label:
                 id:LblCK_Omission 
                 text:"Omission "
             CheckBox:
                 group: 'check_test'
-                id:Ck_Omission
-        BoxLayout:
-            orientation:"horizontal"        
-            Label:
-                id:LblCK_Yoked 
-                text:"Yoked "
-            CheckBox:
-                group: 'check_test'
-                id:Ck_Yoked
-            Label:
-                id:LblCK_Script 
-                text:"Script "
-            CheckBox:
-                group: 'check_test'
-                id:Ck_Script        
+                id:Ck_Omission    
         Label:
             text:"  "
             id:Lbl_Status
