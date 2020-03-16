@@ -70,10 +70,11 @@ def LiberaAliento(self):
 def Alim_Treinamento(self):
            global Alimento_lib
            global Acertos
+           Cont_Press(self)
            if self.ids.Ck_Treinamento.active:
-               if alavanca_ativa == "Direita" and GPIO.input(Press_Direita) == 1:
+               if alavanca_ativa == "Direita" and GPIO.input(Press_Direita) == 0:
                    LiberaAliento(self)                   
-               if alavanca_ativa == "Esquerda" and GPIO.input(Press_Esquerda) == 1:
+               if alavanca_ativa == "Esquerda" and GPIO.input(Press_Esquerda) == 0:
                    LiberaAliento(self)
            print(Acertos)
                         
@@ -82,9 +83,10 @@ def Alim_Treinamento(self):
 def Alim_Reativacao(self):
            global Alimento_lib
            global Acertos
-           if self.ids.Ck_Reativacao.active:
-               if Acertos % 5 == 0:
-                   LiberaAliento(self)
+           Cont_Press(self)
+           #if self.ids.Ck_Reativacao.active:
+           if Acertos % 5 == 0:
+               LiberaAliento(self)
            #        return Alimento_lib
 def Alim_Omission(self):
            global Alimento_lib
@@ -96,6 +98,35 @@ def Alim_Omission(self):
                    elif alavanca_ativa == "Esquerda":
                        LiberaAliento(self)
            #return Alimento_lib           
+def Cont_Press(self):
+            global Acertos
+            global Erros
+            global Direita_press
+            global Esquerda_press
+            #pega as entradas e incrementa os toques na Direita
+            if GPIO.input(Press_Direita) == 0:
+                if alavanca_ativa == "Direita":
+                    GPIO.output(Lamp_Direita,1)
+                    GPIO.output(Lamp_Esquerda,0)
+                    time.sleep(1)
+                    GPIO.output(Lamp_Direita,0)
+                    GPIO.output(Lamp_Esquerda,0)
+                    Acertos += 1
+                else:
+                    Erros += 1
+                Direita_press +=1    
+            #pega as entradas e incrementa os toques na Esquerda
+            if GPIO.input(Press_Esquerda) == 0:
+                if alavanca_ativa == "Esquerda":
+                    GPIO.output(Lamp_Esquerda,1)
+                    GPIO.output(Lamp_Direita,0)
+                    time.sleep(1)
+                    GPIO.output(Lamp_Esquerda,0)
+                    GPIO.output(Lamp_Direita,0)
+                    Acertos += 1
+                else:
+                    Erros += 1
+                Esquerda_press+=1 
 
 class GPIO_TK(App,BoxLayout):    
     GPIO.output(Alav_Esquerda,1)
@@ -143,7 +174,7 @@ class GPIO_TK(App,BoxLayout):
         if self.ids.Ck_Reativacao.active:
             tempo_limite = TAM/3
             #pega os text inputs
-        encerra = tempo_limite*TAM*2    
+        encerra = int(tempo_limite*TAM*4.5)    
         identificacao_soinho = self.ids.TI_Identificacao.text
         Pesquisador = self.ids.TI_Pesquisador.text
         #ativa as alavancas e a luz geral
@@ -156,37 +187,11 @@ class GPIO_TK(App,BoxLayout):
         TempoRand = randint(6,16)
         print("ncerra ",encerra)
         for tempo in range(int(encerra)):
-            #pega as entradas e incrementa os toques na Direita
-            if GPIO.input(Press_Direita) == 1:
-                #nao acontece nada pois a saida trabalha ativada
-                Direita_press = Direita_press
-            else: #alavanca direita e incrementada
-                Direita_press +=1
-                if alavanca_ativa == "Direita":
-                    GPIO.output(Lamp_Direita,1)
-                    time.sleep(1)
-                    GPIO.output(Lamp_Direita,0)
-                    Acertos += 1
-                else:
-                    Erros += 1     
-            #pega as entradas e incrementa os toques na Esquerda
-            if GPIO.input(Press_Esquerda) == 1:
-                Esquerda_press = Esquerda_press
-                #nao acontece nada pois a saida trabalha ativada
-            else:
-                #alavanca direita e incrementada
-                Esquerda_press+=1
-                if alavanca_ativa == "Esquerda":
-                    GPIO.output(Lamp_Esquerda,1)
-                    time.sleep(1)
-                    GPIO.output(Lamp_Esquerda,0)
-                    Acertos += 1
-                else:
-                    Erros += 1
             #verifica o tipo de teste e e executa de acordo com as condicoes
             #pre treino
             if self.ids.Ck_Pre_Treino.active:
                TipoTest = "Pre treino"
+               Cont_Press(self)
                #libera um alimeto a cada minuto
                if tempo == TempoRand :
                    LiberaAliento(self)
@@ -211,13 +216,15 @@ class GPIO_TK(App,BoxLayout):
             #test
             if self.ids.Ck_Test.active:
                TipoTest = "Test"
+               Cont_Press(self)
             #omission
             if self.ids.Ck_Omission.active:
                TipoTest = "Omission"   
             #pausa o processo por meio segundo garantindo o lag da leitura   
-            time.sleep(0.5)
+            
             #continua contadndo o tempo
             #tempo +=1
+            time.sleep(0.1)   
             # verifica se o tempo limite foi alcancado
             if tempo == int(encerra-1):
                 #quando otempo limite for alcancado desliga as saidas exibe as saidas na tela e gera o relatorio em csv
@@ -238,12 +245,6 @@ class GPIO_TK(App,BoxLayout):
                 self.ids.Lbl_TempoLimite2.text=str(tempo_limite)
                 self.ids.Lbl_Status.text=TipoTest+" Finalizado "
                 
-                
-                # arquivo csv
-                with open("exit.csv", "a") as csvfile:
-                    ExitFile = csv.writer(csvfile)
-                    ExitFile.writerow([identificacao_soinho,data_hora_inicial,Direita_press,alavanca_ativa,Acertos,Pesquisador,Esquerda_press,data_hora_final,Erros,Alimento_lib,TipoTest]) # escreve as strings de saida no csv
-                    break
                 Direita_press = 0
                 Esquerda_press = 0
                 Acertos =0 
@@ -255,6 +256,13 @@ class GPIO_TK(App,BoxLayout):
                 tempo_limite = 10
                 encerra = 0
                 alavanca_ativa =StringProperty("padrao")
+                
+                # arquivo csv
+                with open("exit.csv", "a") as csvfile:
+                    ExitFile = csv.writer(csvfile)
+                    ExitFile.writerow([identificacao_soinho,data_hora_inicial,Direita_press,alavanca_ativa,Acertos,Pesquisador,Esquerda_press,data_hora_final,Erros,Alimento_lib,TipoTest]) # escreve as strings de saida no csv
+                    break
+                
                 break
        
     def build(self):
