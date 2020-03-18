@@ -2,8 +2,6 @@
 #  Andriely Franca (mraasf)
 
 
-
-
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
@@ -21,7 +19,7 @@ from picamera import PiCamera
 import datetime as dt
 from time import sleep
 
-TAM = 12
+TAM = 60
 # modulod e controle e resoluçao da camera
 camera = PiCamera()
 camera.resolution = (1280, 720)
@@ -66,6 +64,7 @@ tempo3 = 0
 Alimento_lib = 0
 tempo_limite = 10
 T_Omission = 0
+Ace = 1
 alavanca_ativa =StringProperty("padrao")
 
 # libera o alimento quando a alavanca correta é pressionada no pré treino
@@ -80,18 +79,20 @@ def Alim_Treinamento(self):
            global Alimento_lib
            global Acertos
            Cont_Press(self)
-           if alavanca_ativa == "Direita" and GPIO.input(Press_Direita) == 0:
-               LiberaAliento(self)                   
-           if alavanca_ativa == "Esquerda" and GPIO.input(Press_Esquerda) == 0:
-               LiberaAliento(self)
+           #if alavanca_ativa == "Direita" and GPIO.input(Press_Direita) == 0:
+           #    LiberaAliento(self)                   
+           #if alavanca_ativa == "Esquerda" and GPIO.input(Press_Esquerda) == 0:
+           #    LiberaAliento(self)
            print(Acertos)
 def Alim_Reativacao(self):
            global Alimento_lib
            global Acertos
+           global Ace
            Cont_Press(self)
  # libera o alimento quando a alavanca correta é pressionada cinco vezes          
-           if Acertos % 5 == 0:
+           if Ace % 6 == 0:
                LiberaAliento(self)
+               Ace = 1
 def Alim_Omission(self):
            global Alimento_lib
            global Acertos
@@ -100,20 +101,26 @@ def Alim_Omission(self):
            T_Omission +=1
            #libera o alimento a cada 30 segundos , se as alavancas forem pressionadas os segundos zeram e recomeça a contagem
            if self.ids.Ck_Omission.active:
-               if T_Omission % 300 == 0:
+               if T_Omission == 300:
                    LiberaAliento(self)
-               if GPIO.input(Press_Direita) == 0 or GPIO.input(Press_Esquerda) == 0 :
-                   T_Omission = 0                           
+                   T_Omission=0
+                                        
 def Cont_Press(self):
             global Acertos
             global Erros
             global Direita_press
             global Esquerda_press
+            global Ace
+            global T_Omission
             #pega as entradas e incrementa os toques na Direita
             if GPIO.input(Press_Direita) == 0:
+                T_Omission = 0
                 if alavanca_ativa == "Direita":
+                    Ace += 1
                     GPIO.output(Lamp_Direita,1)
                     GPIO.output(Lamp_Esquerda,0)
+                    if self.ids.Ck_Treinamento.active:
+                        LiberaAliento(self)                        
                     time.sleep(1)
                     GPIO.output(Lamp_Direita,0)
                     GPIO.output(Lamp_Esquerda,0)
@@ -123,10 +130,14 @@ def Cont_Press(self):
                 Direita_press +=1    
             #pega as entradas e incrementa os toques na Esquerda
             if GPIO.input(Press_Esquerda) == 0:
+                T_Omission = 0
                 if alavanca_ativa == "Esquerda":
+                    Ace += 1
                     GPIO.output(Lamp_Esquerda,1)
                     GPIO.output(Lamp_Direita,0)
                     time.sleep(1)
+                    if self.ids.Ck_Treinamento.active:
+                        LiberaAliento(self)
                     GPIO.output(Lamp_Esquerda,0)
                     GPIO.output(Lamp_Direita,0)
                     Acertos += 1
@@ -152,6 +163,7 @@ class GPIO_TK(App,BoxLayout):
         global tempo_limite
         global Alimento_lib
         global tempo
+        global Ace
         #inicializacao das variaveis
         Direita_press = 0
         Esquerda_press = 0
@@ -181,7 +193,7 @@ class GPIO_TK(App,BoxLayout):
         if self.ids.Ck_Reativacao.active:
             tempo_limite = TAM/3
             #pega os text inputs
-        encerra = int(tempo_limite*TAM*4.5)    
+        encerra = int(tempo_limite*TAM*10)    
         identificacao_soinho = self.ids.TI_Identificacao.text
         Pesquisador = self.ids.TI_Pesquisador.text
         data_hora_inicial = time.asctime(time.localtime(time.time()))
@@ -195,7 +207,7 @@ class GPIO_TK(App,BoxLayout):
         #pega a hora inicial
         data_hora_inicial = time.asctime(time.localtime(time.time()))
         #inicia o tempo de controle do alimento com um valor randomico entre 30 e 90
-        TempoRand = randint(6,16)
+        TempoRand = randint(300,900)
         print("encerra ",encerra)
         for tempo in range(int(encerra)):
             #mensagem = "faltam "+str(encerra-tempo)+" segundos"
@@ -209,7 +221,7 @@ class GPIO_TK(App,BoxLayout):
                if tempo == TempoRand :
                    LiberaAliento(self)
                    #incrementa a variavel que controla o tempo do alimento com valores aleatorios entre 30 e 90
-                   TempoRand += randint(6,16)
+                   TempoRand += randint(300,300)
             #treinamento
             if self.ids.Ck_Treinamento.active:
                TipoTest = "Treinamento"
@@ -262,22 +274,22 @@ class GPIO_TK(App,BoxLayout):
                 self.ids.Lbl_Status.text=TipoTest+" Finalizado "
                 camera.stop_preview()
                 camera.stop_recording()
-                Direita_press = 0
-                Esquerda_press = 0
-                Acertos =0 
-                Erros =0
-                tempo = 0
-                tempo2 = 0
-                tempo3 = 0
-                Alimento_lib = 0
-                tempo_limite = 10
-                encerra = 0
-                alavanca_ativa =StringProperty("padrao")
                 
                 # arquivo csv
                 with open("exit.csv", "a") as csvfile:
                     ExitFile = csv.writer(csvfile)
                     ExitFile.writerow([identificacao_soinho,data_hora_inicial,Direita_press,alavanca_ativa,Acertos,Pesquisador,Esquerda_press,data_hora_final,Erros,Alimento_lib,TipoTest]) # escreve as strings de saida no csv
+                    Direita_press = 0
+                    Esquerda_press = 0
+                    Acertos =0 
+                    Erros =0
+                    tempo = 0
+                    tempo2 = 0
+                    tempo3 = 0
+                    Alimento_lib = 0
+                    tempo_limite = 10
+                    encerra = 0
+                    Ace  = 1
                     break
                 
                 break
