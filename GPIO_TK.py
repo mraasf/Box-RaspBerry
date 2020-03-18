@@ -17,8 +17,16 @@ import time
 import csv
 from kivy.properties import StringProperty
 from kivy.lang import Builder
+from picamera import PiCamera
+import datetime as dt
+from time import sleep
 
 TAM = 12
+# modulod e controle e resoluçao da camera
+camera = PiCamera()
+camera.resolution = (1280, 720)
+
+
 # atribui variaveis as saidas
 Alimento = 40
 Alav_Esquerda = 38
@@ -57,6 +65,7 @@ tempo2 = 0
 tempo3 = 0
 Alimento_lib = 0
 tempo_limite = 10
+T_Omission = 0
 alavanca_ativa =StringProperty("padrao")
 
 # libera o alimento quando a alavanca correta é pressionada no pré treino
@@ -71,33 +80,30 @@ def Alim_Treinamento(self):
            global Alimento_lib
            global Acertos
            Cont_Press(self)
-           if self.ids.Ck_Treinamento.active:
-               if alavanca_ativa == "Direita" and GPIO.input(Press_Direita) == 0:
-                   LiberaAliento(self)                   
-               if alavanca_ativa == "Esquerda" and GPIO.input(Press_Esquerda) == 0:
-                   LiberaAliento(self)
+           if alavanca_ativa == "Direita" and GPIO.input(Press_Direita) == 0:
+               LiberaAliento(self)                   
+           if alavanca_ativa == "Esquerda" and GPIO.input(Press_Esquerda) == 0:
+               LiberaAliento(self)
            print(Acertos)
-                        
-            #return Alimento_lib
-# libera o alimento quando a alavanca correta é pressionada cinco vezes
 def Alim_Reativacao(self):
            global Alimento_lib
            global Acertos
            Cont_Press(self)
-           #if self.ids.Ck_Reativacao.active:
+ # libera o alimento quando a alavanca correta é pressionada cinco vezes          
            if Acertos % 5 == 0:
                LiberaAliento(self)
-           #        return Alimento_lib
 def Alim_Omission(self):
            global Alimento_lib
            global Acertos
+           global T_Omission
+           Cont_Press(self)
+           T_Omission +=1
+           #libera o alimento a cada 30 segundos , se as alavancas forem pressionadas os segundos zeram e recomeça a contagem
            if self.ids.Ck_Omission.active:
-               if Acertos % 5 == 0:
-                   if alavanca_ativa == "Direita" :
-                       LiberaAliento(self)
-                   elif alavanca_ativa == "Esquerda":
-                       LiberaAliento(self)
-           #return Alimento_lib           
+               if T_Omission % 300 == 0:
+                   LiberaAliento(self)
+               if GPIO.input(Press_Direita) == 0 or GPIO.input(Press_Esquerda) == 0 :
+                   T_Omission = 0                           
 def Cont_Press(self):
             global Acertos
             global Erros
@@ -145,6 +151,7 @@ class GPIO_TK(App,BoxLayout):
         global alavanca_ativa
         global tempo_limite
         global Alimento_lib
+        global tempo
         #inicializacao das variaveis
         Direita_press = 0
         Esquerda_press = 0
@@ -177,6 +184,10 @@ class GPIO_TK(App,BoxLayout):
         encerra = int(tempo_limite*TAM*4.5)    
         identificacao_soinho = self.ids.TI_Identificacao.text
         Pesquisador = self.ids.TI_Pesquisador.text
+        data_hora_inicial = time.asctime(time.localtime(time.time()))
+        name =str(identificacao_soinho+'_'+data_hora_inicial+'.h264')
+        camera.start_recording(name)
+        camera.start_preview()
         #ativa as alavancas e a luz geral
         GPIO.output(Alav_Direita,1)
         GPIO.output(Alav_Esquerda,1)
@@ -185,8 +196,10 @@ class GPIO_TK(App,BoxLayout):
         data_hora_inicial = time.asctime(time.localtime(time.time()))
         #inicia o tempo de controle do alimento com um valor randomico entre 30 e 90
         TempoRand = randint(6,16)
-        print("ncerra ",encerra)
+        print("encerra ",encerra)
         for tempo in range(int(encerra)):
+            #mensagem = "faltam "+str(encerra-tempo)+" segundos"
+            camera.annotate_text = str(encerra-tempo)
             #verifica o tipo de teste e e executa de acordo com as condicoes
             #pre treino
             if self.ids.Ck_Pre_Treino.active:
@@ -219,12 +232,15 @@ class GPIO_TK(App,BoxLayout):
                Cont_Press(self)
             #omission
             if self.ids.Ck_Omission.active:
-               TipoTest = "Omission"   
-            #pausa o processo por meio segundo garantindo o lag da leitura   
+               TipoTest = "Omission"
+               Alim_Omission(self)
+               
+            #pausa o processo por 0.1 segundos garantindo o lag da leitura   
             
             #continua contadndo o tempo
             #tempo +=1
             time.sleep(0.1)   
+            espera = encerra
             # verifica se o tempo limite foi alcancado
             if tempo == int(encerra-1):
                 #quando otempo limite for alcancado desliga as saidas exibe as saidas na tela e gera o relatorio em csv
@@ -244,7 +260,8 @@ class GPIO_TK(App,BoxLayout):
                 self.ids.Lbl_Alimntos_liberados.text=str(Alimento_lib)
                 self.ids.Lbl_TempoLimite2.text=str(tempo_limite)
                 self.ids.Lbl_Status.text=TipoTest+" Finalizado "
-                
+                camera.stop_preview()
+                camera.stop_recording()
                 Direita_press = 0
                 Esquerda_press = 0
                 Acertos =0 
